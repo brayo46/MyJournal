@@ -70,7 +70,7 @@ class SingleEntry(Resource):
         except Exception as e:
             return {'message': 'entry does not exist'}, 404
 
-    
+    #NEW METHOD
     def update(self, entry_id, new_title, new_body):
         """ Modify an entry """
         entries[entry_id]['title'] = new_title
