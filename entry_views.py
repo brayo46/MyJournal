@@ -1,26 +1,22 @@
-import sys
-print sys.getdefaultencoding()
-# -*- coding: utf-8 -*-
-
 from flask import Flask
 from flask_restplus import Api, Resource, Namespace, fields
 from flask import request, jsonify
 from datetime import datetime
 
 
-from entry_models import journalEntry
+from entry_models import DiaryEntry
 
 app = Flask(__name__)
 
-api = Api(app, version='1.0', title='My Journal', description= 'My Online Journal')
+api = Api(app, version='1.0', title='My Diary', description= 'Online journal where users can pen down their thoughts and feelings')
 
-# data structure to store entry offers
+    # data structure to store entry offers
 entries = {}
 
 entry = api.model('entry offer', {
-    'title': fields.String(description='title of journal entry'),
-    'body': fields.String(description='body of journal entry')
-    
+    'title': fields.String(description='title of diary entry'),
+    'body': fields.String(description='body of diary entry')
+
 })
 
 
@@ -28,7 +24,7 @@ entry = api.model('entry offer', {
 @api.route('/api/v1/entries')
 class Entries(Resource):
 
-    @api.doc(responses={'message': 'journal entry added successfully.',
+    @api.doc(responses={'message': 'diary entry added successfully.',
                         201: 'Created', 400: 'BAD FORMAT'})
     @api.expect(entry)
     def post(self):
@@ -37,17 +33,17 @@ class Entries(Resource):
         # Check whether there is data
         if any(data):
             # save entry to data structure
-            
-            try:
+
+
                 # set id for the entry offer
-                journal_entry = journalEntry(data)
+                diary_entry = DiaryEntry(data)
                 entry_id = len(entries) + 1
-                entries[(entry_id)] = journal_entry.getDict()
-                response = {'message': 'journal entry added successfully.',
+                entries[(entry_id)] = diary_entry.getDict()
+                response = {'message': 'diary entry added successfully.',
                             'entry id': entry_id}
                 return response, 201
-            except Exception as e:
-                return {'message': 'use correct format for date and time.'}, 400
+
+
         else:
             return {'message': 'make sure you provide all required fields.'}, 400
 
@@ -56,15 +52,17 @@ class Entries(Resource):
         """Fetch all entries."""
         return (entries)
 
-#api.add_resource(entries, '/entries')
 
-@api.route('/api/v1/entries/<string:entry_id>')
+
+@api.route('/api/v1/entries/<string:entry_id>', methods=['GET','PUT'])
 class SingleEntry(Resource):
+
 
     @api.doc('Fetch a single entry',
              params={'entry_id': 'Id for a single entry'},
              responses={200: 'OK', 404: 'NOT FOUND'})
     def get(self, entry_id):
+
         """Fetch a single entry."""
         try:
             entry = entries[int(entry_id)]
@@ -73,14 +71,22 @@ class SingleEntry(Resource):
         except Exception as e:
             return {'message': 'entry does not exist'}, 404
 
+
+    def update(self, entry_id, new_title, new_body):
+        """ Modify an entry """
+        entries[entry_id]['title'] = new_title
+        entries[entry_id]['body']  = new_body
+        response = {'message': 'diary entry edited successfully.',
+                            'entry id': entry_id}
+        return response, 201
+
+
+
     
-    def update(self, entry_id):
-        ''' Modify an entry '''
 
 
 
 
-'''
-if __name__=='__main__':
-    app.run(debug=True)
-'''
+
+#if __name__=='__main__':
+    #app.run(debug=True)
