@@ -4,18 +4,17 @@ from flask import request, jsonify
 from datetime import datetime
 
 
-from entry_models import DiaryEntry
+from entry_models import JournalEntry
 
 app = Flask(__name__)
 
-api = Api(app, version='1.0', title='My Diary', description= 'Online journal where users can pen down their thoughts and feelings')
-
+api = Api(app, version='1.0', title='My Journal', description= 'Online journal')
     # data structure to store entry offers
 entries = {}
 
 entry = api.model('entry offer', {
-    'title': fields.String(description='title of diary entry'),
-    'body': fields.String(description='body of diary entry')
+    'title': fields.String(description='title of journal entry'),
+    'body': fields.String(description='body of journal entry')
 
 })
 
@@ -24,7 +23,7 @@ entry = api.model('entry offer', {
 @api.route('/api/v1/entries')
 class Entries(Resource):
 
-    @api.doc(responses={'message': 'diary entry added successfully.',
+    @api.doc(responses={'message': 'journal entry added successfully.',
                         201: 'Created', 400: 'BAD FORMAT'})
     @api.expect(entry)
     def post(self):
@@ -36,10 +35,10 @@ class Entries(Resource):
 
 
                 # set id for the entry offer
-                diary_entry = DiaryEntry(data)
+                journal_entry = journalEntry(data)
                 entry_id = len(entries) + 1
-                entries[(entry_id)] = diary_entry.getDict()
-                response = {'message': 'diary entry added successfully.',
+                entries[(entry_id)] = journal_entry.getDict()
+                response = {'message': 'journal entry added successfully.',
                             'entry id': entry_id}
                 return response, 201
 
@@ -71,12 +70,12 @@ class SingleEntry(Resource):
         except Exception as e:
             return {'message': 'entry does not exist'}, 404
 
-
+    @api.expect(entry)
     def update(self, entry_id, new_title, new_body):
         """ Modify an entry """
         entries[entry_id]['title'] = new_title
         entries[entry_id]['body']  = new_body
-        response = {'message': 'diary entry edited successfully.',
+        response = {'message': 'journal entry edited successfully.',
                             'entry id': entry_id}
         return response, 201
 

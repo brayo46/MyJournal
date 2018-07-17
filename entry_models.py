@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-class DiaryEntry(object):
+class JournalEntry(object):
 
     """Model of a single journal entry
 
