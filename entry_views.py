@@ -53,7 +53,7 @@ class Entries(Resource):
 
 
 
-@api.route('/api/v1/entries/<string:entry_id>', methods=['GET','PUT'])
+@api.route('/api/v1/entries/<string:entry_id>', methods=['GET'])
 class SingleEntry(Resource):
 
 
@@ -70,7 +70,10 @@ class SingleEntry(Resource):
         except Exception as e:
             return {'message': 'entry does not exist'}, 404
 
-    #NEW METHOD
+    @api.doc('Update a single entry',
+             params={'entry_id': 'Id for a single entry','new_title': 'new title of entry','new_body': 'new_body_of entry'},
+
+             responses={200: 'OK', 404: 'NOT FOUND'})
     def update(self, entry_id, new_title, new_body):
         """ Modify an entry """
         entries[entry_id]['title'] = new_title
